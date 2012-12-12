@@ -1,8 +1,8 @@
 s3cli
 =====
 
-s3cli is S3 client and S3 Command Line Interface.
-inspired by Python's [s3cmd](https://github.com/s3tools/s3cmd).
+s3cli is S3 client and S3 Command Line Interface.  
+inspired by Python's [s3cmd](https://github.com/s3tools/s3cmd).  
 
 ## S3 and Compatible service
 * [S3](http://aws.amazon.com/s3/)
