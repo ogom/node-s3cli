@@ -1,0 +1,34 @@
+{
+  "name": "s3cli",
+  "version": "0.1.2",
+  "description": "S3 client and S3 Command Line Interface",
+  "main": "./index",
+  "bin": {
+    "s3cli": "./bin/s3cli"
+  },
+  "scripts": {
+    "test": "make test-spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ogom/node-s3cli.git"
+  },
+  "keywords": ["amazon", "aws", "s3"],
+  "author": "ogom <ogom@hotmail.co.jp>",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "commander": "1.1.x",
+    "cli-table": "0.2.x",
+    "eyes": "0.1.x",
+    "mime": "1.2.x",
+    "xml2js": "0.2.x"
+  },
+  "devDependencies": {
+    "mocha": "1.7.x",
+    "chai": "1.4.x"
+  },
+  "engines": {
+    "node": ">=0.8.x"
+  } 
+}

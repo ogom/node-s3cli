@@ -1,0 +1,174 @@
+#!/usr/bin/env node
+
+/*!
+ * s3cli
+ */
+'use strict';
+
+var fs = require('fs'),
+    path = require('path'),
+    cli = require('../lib/cli_helper'),
+    utils = require('../lib/utils');
+
+cli.program
+  .version('0.1.2')
+  .option('-r, --raw', 'Raw response body')
+  .option('-e, --eyes', 'Eyes debug mode')
+  .option('-d, --debug', 'Enable debug output')
+
+cli.program
+  .command('lb')
+  .description('List of all buckets')
+  .action(function () {
+    cli.client().service.buckets(function (err, res) {
+      cli.output(err, res, {content: 'buckets.bucket', table: 'h'});
+    });
+  });
+
+cli.program
+  .command('mb <bucket>')
+  .description('Make bucket')
+  .action(function (bucket) {
+    cli.client().buckets.create(bucket, function (err, res) {
+      cli.output(err, res, {message: "Bucket '" + bucket + "' created"});
+    });
+  });
+
+cli.program
+  .command('rb <bucket>')
+  .description('Remove bucket')
+  .action(function (bucket) {
+    cli.client().buckets.destroy(bucket, function (err, res) {
+      cli.output(err, res, {message: "Bucket '" + bucket + "' removed"});
+    });
+  });
+
+cli.program
+  .command('use [bucket]')
+  .description('Use bucket')
+  .action(function (bucket) {
+    var config = cli.config;
+    if (bucket) {
+      config.use_bucket = bucket;
+      cli.configure.write(config);
+    }
+    console.log("use %s", config.use_bucket);
+  });
+
+cli.program
+  .command('ls [prefix]')
+  .description('List of all objects')
+  .option('-b, --bucket <string>', 'Use bucket')
+  .option('-l, --delimiter <string>', 'A delimiter is a character you use to group keys')
+  .action(function (prefix) {
+    var program = cli.subcommand(cli.program.commands, 'ls');
+    var bucket = program.bucket || cli.config.use_bucket;
+    var options = {
+      prefix: prefix,
+      delimiter: program.delimiter
+    };
+
+    cli.client().buckets.objects(bucket, options, function (err, res) {
+      cli.output(err, res, {content: 'contents', table: 'h', exclude: ['owner', 'etag']});
+    });
+  });
+
+cli.program
+  .command('set <name> <value>')
+  .description('Set value of a object from bucket at name')
+  .option('-b, --bucket <string>', 'Use bucket')
+  .option('-P, --acl-public', 'Store objects with ACL allowing read for anyone')
+  .action(function (name, value) {
+    var program = cli.subcommand(cli.program.commands, 'set');
+    var bucket = program.bucket || cli.config.use_bucket;
+    var options = {};
+
+    if (program.aclPublic) {
+      options['x-amz-acl'] = 'public-read'
+    }
+
+    cli.client().objects.create(bucket, name, value, options, function (err, res) {
+      cli.output(err, res, {message: "Object '" + bucket + '/' + name  + "' created"});
+    });
+  });
+
+
+cli.program
+  .command('put <name> <file>')
+  .description('Put file of a object from bucket at name')
+  .option('-b, --bucket <string>', 'Use bucket')
+  .option('-P, --acl-public', 'Store objects with ACL allowing read for anyone')
+  .action(function (name, file) {
+    var program = cli.subcommand(cli.program.commands, 'put');
+    var bucket = program.bucket || cli.config.use_bucket;
+    var size = cli.config.send_chunk || 64 * 1024;
+    var options = {};
+
+    if (program.aclPublic) {
+      options['x-amz-acl'] = 'public-read'
+    }
+
+    var stream = fs.createReadStream(path.resolve(file), {bufferSize: size});
+    cli.client().objects.create(bucket, name, stream, options, function (err, res) {
+      cli.output(err, res, {message: "File '" + bucket + '/' + name  + "' created"});
+    });
+  });
+
+cli.program
+  .command('get <name>')
+  .description('Get value of a object from bucket at name')
+  .option('-b, --bucket <string>', 'Use bucket')
+  .action(function (name) {
+    var program = cli.subcommand(cli.program.commands, 'get');
+    var bucket = program.bucket || cli.config.use_bucket;
+
+    cli.client().objects.read(bucket, name, function (err, res) {
+      cli.output(err, res);
+    });
+  });
+
+cli.program
+  .command('del <name>')
+  .description('Delete a object from bucket at name')
+  .option('-b, --bucket <string>', 'Use bucket')
+  .action(function (name) {
+    var program = cli.subcommand(cli.program.commands, 'del');
+    var bucket = program.bucket || cli.config.use_bucket;
+
+    cli.client().objects.destroy(bucket, name, function (err, res) {
+      cli.output(err, res, {message: "Object '" + bucket + '/' + name  + "' deleted"});
+    });
+  });
+
+cli.program
+  .command('info <name>')
+  .description('Get object information')
+  .option('-b, --bucket <string>', 'Use bucket')
+  .action(function (name) {
+    var program = cli.subcommand(cli.program.commands, 'info');
+    var bucket = program.bucket || cli.config.use_bucket;
+
+    cli.client().objects.info(bucket, name, function (err, res) {
+      console.log('object: %s/%s', bucket, name);
+      cli.output(err, res, {content: 'info', table: 'v'});
+      cli.client().objects.acl(bucket, name).read(function (err, res) {
+        console.log('access control list:');
+        cli.output(err, res, {content: 'accesscontrollist.grant', table: 'v', include: ['permission']});
+      });
+    });
+  });
+
+cli.program
+  .command('init')
+  .description('Invoke interactive (re)configuration')
+  .action(function () {
+    cli.configure.make(function () {
+      cli.config = cli.configure.read();
+      cli.client().service.buckets(function (err, res) {
+        cli.output(err, res, {message: 'Successful configuration'});
+        process.exit();
+      });
+    });
+  });
+
+cli.program.parse(process.argv);

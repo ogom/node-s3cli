@@ -1,0 +1,11 @@
+{
+  "owner": { "id": "abcdef", "displayname": "s3cli" },
+  "buckets": {
+    "bucket": [
+      { "creationdate": "2012-12-12T12:12:01.000Z", "name": "001" },
+      { "creationdate": "2012-12-12T12:12:02.000Z", "name": "002" },
+      { "creationdate": "2012-12-12T12:12:03.000Z", "name": "003" }
+    ]
+  },
+  "$": { "xmlns": "http://s3.amazonaws.com/doc/2006-03-01/" }
+}

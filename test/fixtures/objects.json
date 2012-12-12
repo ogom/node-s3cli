@@ -1,0 +1,26 @@
+{
+  "maxkeys": "1000",
+  "prefix": {},
+  "istruncated": "false",
+  "name": "bucket01",
+  "contents": [
+    {
+      "key": "object01.txt",
+      "lastmodified": "2012-12-12T12:12:01.000Z",
+      "owner": { "id": "abcdef", "displayname": "s3cli" },
+      "size": "101",
+      "etag": "12345",
+      "storageclass": "STANDARD"
+    },
+    {
+      "key": "object02.txt",
+      "lastmodified": "2012-12-12T12:12:02.000Z",
+      "owner": { "id": "abcdef", "displayname": "s3cli" },
+      "size": "202",
+      "etag": "67890",
+      "storageclass": "STANDARD"
+    }
+  ],
+  "marker": {},
+  "$": { "xmlns": "http://s3.amazonaws.com/doc/2006-03-01/" }
+}
