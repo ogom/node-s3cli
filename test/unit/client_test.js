@@ -1,7 +1,7 @@
 'use strict';
 
 require('../mock/request');
-var s3 = require('../../lib/index');
+var s3 = require('../../');
 var client = s3.createClient({host_base: 'example.com'});
 
     

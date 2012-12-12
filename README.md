@@ -72,5 +72,14 @@ client.objects.destroy('bucket', 'object', function (err, res) {
 });
 ```
 
+## Tests
+
+```
+$ make test
+```
+
+[![Build Status](https://secure.travis-ci.org/ogom/node-s3cli.png?branch=master)](http://travis-ci.org/ogom/node-s3cli)
+
+
 ## Licence
 * MIT
