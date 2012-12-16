@@ -1,6 +1,6 @@
 {
   "name": "s3cli",
-  "version": "0.1.2",
+  "version": "1.0.1",
   "description": "S3 client and S3 Command Line Interface",
   "main": "./index",
   "bin": {

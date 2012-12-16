@@ -2,6 +2,8 @@
 
 /*!
  * s3cli
+ * Copyright(c) 2012 ogom
+ * MIT Licensed
  */
 'use strict';
 
@@ -11,7 +13,7 @@ var fs = require('fs'),
     utils = require('../lib/utils');
 
 cli.program
-  .version('0.1.2')
+  .version('1.0.1')
   .option('-r, --raw', 'Raw response body')
   .option('-e, --eyes', 'Eyes debug mode')
   .option('-d, --debug', 'Enable debug output')
@@ -37,10 +39,40 @@ cli.program
 cli.program
   .command('rb <bucket>')
   .description('Remove bucket')
-  .action(function (bucket) {
-    cli.client().buckets.destroy(bucket, function (err, res) {
-      cli.output(err, res, {message: "Bucket '" + bucket + "' removed"});
-    });
+  .option('-R, --recursive', 'Remove the object recursively')
+  .action(function (bucket) {    
+    var program = cli.subcommand(cli.program.commands, 'rb');
+    var client = cli.client();
+
+    if (program.recursive) {
+      var fn = {};
+      fn.destroy = function(bucket, cb) {
+        client.buckets.objects(bucket, {}, function (err, res) {
+          var contents = res.content.contents;
+          contents.forEach(function (object) {
+            client.objects.destroy(bucket, object.key, function (err, res) {
+              cli.output(err, res, {message: "Object '" + bucket + '/' + object.key + "' removed"});
+              if (contents[contents.length-1].key === object.key) cb();
+            });
+          });
+        });
+      };
+
+      fn.destroy(bucket, function () {
+        var t = setInterval(function () {
+          client.buckets.destroy(bucket, function (err, res) {
+            if (res.status === 204) {
+              clearInterval(t);
+              cli.output(err, res, {message: "Bucket '" + bucket + "' removed"});  
+            }
+          });
+        }, 1000);
+      });
+    } else {
+      client.buckets.destroy(bucket, function (err, res) {
+        cli.output(err, res, {message: "Bucket '" + bucket + "' removed"});
+      });
+    }
   });
 
 cli.program
@@ -88,29 +120,7 @@ cli.program
     }
 
     cli.client().objects.create(bucket, name, value, options, function (err, res) {
-      cli.output(err, res, {message: "Object '" + bucket + '/' + name  + "' created"});
-    });
-  });
-
-
-cli.program
-  .command('put <name> <file>')
-  .description('Put file of a object from bucket at name')
-  .option('-b, --bucket <string>', 'Use bucket')
-  .option('-P, --acl-public', 'Store objects with ACL allowing read for anyone')
-  .action(function (name, file) {
-    var program = cli.subcommand(cli.program.commands, 'put');
-    var bucket = program.bucket || cli.config.use_bucket;
-    var size = cli.config.send_chunk || 64 * 1024;
-    var options = {};
-
-    if (program.aclPublic) {
-      options['x-amz-acl'] = 'public-read'
-    }
-
-    var stream = fs.createReadStream(path.resolve(file), {bufferSize: size});
-    cli.client().objects.create(bucket, name, stream, options, function (err, res) {
-      cli.output(err, res, {message: "File '" + bucket + '/' + name  + "' created"});
+      cli.output(err, res, {message: "Object '" + bucket + '/' + name + "' created"});
     });
   });
 
@@ -128,6 +138,41 @@ cli.program
   });
 
 cli.program
+  .command('push <name> <file>')
+  .description('Push file of a object from bucket at name')
+  .option('-b, --bucket <string>', 'Use bucket')
+  .option('-P, --acl-public', 'Store objects with ACL allowing read for anyone')
+  .action(function (name, file) {
+    var program = cli.subcommand(cli.program.commands, 'push');
+    var bucket = program.bucket || cli.config.use_bucket;
+    var size = cli.config.send_chunk || 64 * 1024;
+    var options = {};
+
+    if (program.aclPublic) {
+      options['x-amz-acl'] = 'public-read'
+    }
+
+    var stream = fs.createReadStream(path.resolve(file), {bufferSize: size});
+    cli.client().objects.create(bucket, name, stream, options, function (err, res) {
+      cli.output(err, res, {message: "File '" + bucket + '/' + name + "' created"});
+    });
+  });
+
+cli.program
+  .command('pull <name> <file>')
+  .description('Pull file of a object from bucket at name')
+  .option('-b, --bucket <string>', 'Use bucket')
+  .action(function (name, file) {
+    var program = cli.subcommand(cli.program.commands, 'pull');
+    var bucket = program.bucket || cli.config.use_bucket;
+    
+    cli.client().objects.read(bucket, name, function (err, res) {
+      fs.writeFileSync(path.resolve(file), res.body, 'binary');
+      cli.output(err, res, {message: "File '" + bucket + '/' + name + "' saved"});
+    });
+  });
+
+cli.program
   .command('del <name>')
   .description('Delete a object from bucket at name')
   .option('-b, --bucket <string>', 'Use bucket')
@@ -136,7 +181,7 @@ cli.program
     var bucket = program.bucket || cli.config.use_bucket;
 
     cli.client().objects.destroy(bucket, name, function (err, res) {
-      cli.output(err, res, {message: "Object '" + bucket + '/' + name  + "' deleted"});
+      cli.output(err, res, {message: "Object '" + bucket + '/' + name + "' removed"});
     });
   });
 
@@ -149,11 +194,11 @@ cli.program
     var bucket = program.bucket || cli.config.use_bucket;
 
     cli.client().objects.info(bucket, name, function (err, res) {
-      console.log('object: %s/%s', bucket, name);
+      console.log('URL: http://%s.%s/%s', bucket, cli.config.host_base, name);
       cli.output(err, res, {content: 'info', table: 'v'});
       cli.client().objects.acl(bucket, name).read(function (err, res) {
         console.log('access control list:');
-        cli.output(err, res, {content: 'accesscontrollist.grant', table: 'v', include: ['permission']});
+        cli.output(err, res, {content: 'accesscontrollist.grant', table: 'h', exclude: ['grantee']});
       });
     });
   });

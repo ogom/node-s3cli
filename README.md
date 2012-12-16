@@ -1,12 +1,22 @@
 s3cli
 =====
 
-s3cli is S3 client and S3 Command Line Interface.  
+s3cli is [S3](http://aws.amazon.com/s3/) client and S3 Command Line Interface.  
 inspired by Python's [s3cmd](https://github.com/s3tools/s3cmd).  
 
-## S3 and Compatible service
-* [S3](http://aws.amazon.com/s3/)
+
+## S3 compatible service
+
 * [RiakCS](http://basho.com/products/riakcs/)
+
+
+## Features
+
+* Response content is JSON.
+* Debug output Request and Response.
+* Output style is Table or XML or Eyes.
+* CLI is sub command style.
+
 
 ## Installation
 
@@ -14,9 +24,11 @@ inspired by Python's [s3cmd](https://github.com/s3tools/s3cmd).
 $ npm install s3cli -g
 ```
 
+
 ## Usage
 
 ### CLI
+Invoke interactive configuration.
 
 ```
 $ s3cli init
@@ -25,7 +37,37 @@ $ s3cli use bucket
 $ s3cli set object value
 ```
 
+#### Output XML
+XML is set to body of response.
+
+```
+$ s3cli lb --raw
+```
+
+
+#### Bucket use
+Set to config the Bucket name.
+
+```
+$ s3cli lb
+$ s3cli use bucket
+$ s3cli get object
+```
+
+
+#### Recursively
+Remove the object recursively
+
+```
+$ s3cli rb bucket
+The bucket you tried to delete is not empty
+$ s3cli rb bucket -R
+Object 'bucket/object' removed
+Bucket 'bucket' removed
+```
+
 ### Program
+JSON is set to content of response.
 
 ```
 // create client
@@ -72,14 +114,16 @@ client.objects.destroy('bucket', 'object', function (err, res) {
 });
 ```
 
+
 ## Tests
 
 ```
 $ make test
 ```
 
-[![Build Status](https://secure.travis-ci.org/ogom/node-s3cli.png?branch=master)](http://travis-ci.org/ogom/node-s3cli)
+[![Build Status](https://travis-ci.org/ogom/node-s3cli.png?branch=master)](https://travis-ci.org/ogom/node-s3cli)
 
 
 ## Licence
+
 * MIT
