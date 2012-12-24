@@ -207,7 +207,7 @@ cli.program
   .command('init')
   .description('Invoke interactive (re)configuration')
   .action(function () {
-    cli.configure.make(function () {
+    cli.configure.init(function () {
       cli.config = cli.configure.read();
       cli.client().service.buckets(function (err, res) {
         cli.output(err, res, {message: 'Successful configuration'});

@@ -1,7 +1,16 @@
 s3cli
 =====
 
-s3cli is [S3](http://aws.amazon.com/s3/) client and S3 Command Line Interface.  
+```
+  .                  .
+ / \                 |    o        
+|\ /| .--. .--.  .-. |    .       
+| | | `--.  --: (    |    |      
+ \|/  `--' `--'  `-' `- -' `-    
+  '                                                             
+```
+
+s3cli is [S3](http://aws.amazon.com/s3/) client and S3 Command Line Interface.
 inspired by Python's [s3cmd](https://github.com/s3tools/s3cmd).  
 
 
