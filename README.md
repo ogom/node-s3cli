@@ -7,7 +7,7 @@ s3cli
 |\ /| .--. .--.  .-. |    .       
 | | | `--.  --: (    |    |      
  \|/  `--' `--'  `-' `- -' `-    
-  '                                                             
+  '
 ```
 
 s3cli is [S3](http://aws.amazon.com/s3/) client and S3 Command Line Interface.
