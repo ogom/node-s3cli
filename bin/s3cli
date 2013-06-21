@@ -2,7 +2,7 @@
 
 /*!
  * s3cli
- * Copyright(c) 2012 ogom
+ * Copyright(c) 2012-2013 ogom
  * MIT Licensed
  */
 'use strict';

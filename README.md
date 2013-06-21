@@ -1,6 +1,8 @@
 s3cli
 =====
 
+[![Build Status](https://travis-ci.org/ogom/node-s3cli.png?branch=master)](https://travis-ci.org/ogom/node-s3cli)
+
 ```
   .                .
  / \               |   o
@@ -11,7 +13,7 @@ s3cli
 ```
 
 s3cli is [S3](http://aws.amazon.com/s3/) client and S3 Command Line Interface.  
-inspired by Python's [s3cmd](https://github.com/s3tools/s3cmd).  
+Inspired by Python's [s3cmd](https://github.com/s3tools/s3cmd).  
 
 
 ## S3 compatible service
@@ -129,8 +131,6 @@ client.objects.destroy('bucket', 'object', function (err, res) {
 ```
 $ make test
 ```
-
-[![Build Status](https://travis-ci.org/ogom/node-s3cli.png?branch=master)](https://travis-ci.org/ogom/node-s3cli)
 
 
 ## Licence
