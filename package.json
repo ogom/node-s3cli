@@ -18,15 +18,15 @@
   "license": "MIT",
   "readmeFilename": "README.md",
   "dependencies": {
-    "commander": "1.1.x",
+    "commander": "1.2.x",
     "cli-table": "0.2.x",
     "eyes": "0.1.x",
     "mime": "1.2.x",
     "xml2js": "0.2.x"
   },
   "devDependencies": {
-    "mocha": "1.7.x",
-    "chai": "1.4.x"
+    "mocha": "1.11.x",
+    "chai": "1.7.x"
   },
   "engines": {
     "node": ">=0.8.x"
